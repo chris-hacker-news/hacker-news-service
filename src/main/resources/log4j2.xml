@@ -4,10 +4,16 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %msg%n"/>
         </Console>
+
+        <File name="File" fileName="service.log">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %msg%n"/>
+        </File>
+
     </Appenders>
     <Loggers>
         <Root level="trace">
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
         </Root>
     </Loggers>
 </Configuration>
