@@ -1,1 +1,4 @@
 news.json
+.idea
+target
+*.DS_Store
