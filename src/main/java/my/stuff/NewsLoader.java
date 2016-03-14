@@ -83,43 +83,47 @@ public class NewsLoader {
     }
 
     private void fetchLatestEntries() {
-        while (jsonLoader.isAlive()) {
+        try {
+            while (jsonLoader.isAlive()) {
 
-            do {
-                try (InputStream in = new URL(source.getUrl()).openStream()) {
-                    processLatestEntries(new Gson().fromJson(IOUtils.toString(in), Long[].class));
-                } catch (Exception e) {
-                    LOGGER.error("Unable to load '" + source.getUrl() + "'.", e);
-                    break;
-                }
+                do {
+                    try (InputStream in = new URL(source.getUrl()).openStream()) {
+                        processLatestEntries(new Gson().fromJson(IOUtils.toString(in), Long[].class));
+                    } catch (Exception e) {
+                        LOGGER.error("Unable to load '" + source.getUrl() + "'.", e);
+                        break;
+                    }
+
+                    try {
+                        File src = new File("news.json.next"), dst = new File("news.json");
+
+                        FileUtils.write(src, new GsonBuilder().setPrettyPrinting().create().toJson(
+                                getEntries().collect(Collectors.toList())));
+                        FileUtils.deleteQuietly(dst);
+                        FileUtils.moveFile(src, dst);
+
+                        FileUtils.write(
+                                new File("website/news.js"),
+                                "var newsArray = " + FileUtils.readFileToString(dst) + ";");
+
+                    } catch (Exception e) {
+                        LOGGER.error("Unable to save data.", e);
+                        break;
+                    }
+                } while (false);
 
                 try {
-                    File src = new File("news.json.next"), dst = new File("news.json");
-
-                    FileUtils.write(src, new GsonBuilder().setPrettyPrinting().create().toJson(
-                            getEntries().collect(Collectors.toList())));
-                    FileUtils.deleteQuietly(dst);
-                    FileUtils.moveFile(src, dst);
-
-                    FileUtils.write(
-                            new File("website/news.js"),
-                            "var newsArray = " + FileUtils.readFileToString(dst) + ";");
-
-                } catch (Exception e) {
-                    LOGGER.error("Unable to save data.", e);
-                    break;
+                    Thread.sleep(60000);
+                } catch (InterruptedException e1) {
                 }
-            }while(false);
-
-            try {
-                Thread.sleep(60000);
-            } catch (InterruptedException e1) {
             }
+        } catch (Throwable e) {
+            LOGGER.fatal(e);
         }
     }
 
     private void processLatestEntries(Long[] ids) {
-        for(int i = ids.length / 2; i < ids.length; i++) {
+        for (int i = ids.length / 2; i < ids.length; i++) {
             String id = ids[i].toString();
             if (entries.containsKey(id)) {
                 continue;
