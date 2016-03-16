@@ -20,9 +20,11 @@ import java.util.stream.Stream;
 
 public class NewsLoader {
     private static final Logger LOGGER = LogManager.getLogger(NewsLoader.class);
+    private static final int DAY_OFFSET = -7;
 
     public enum SOURCES {
-        News("https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty");
+        News("https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty"),
+        Best("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty");
 
         private final String url;
 
@@ -55,7 +57,7 @@ public class NewsLoader {
                 entries.put(entry.id, entry);
             }
 
-            Date lastWeek = DateUtils.addDays(Date.from(Instant.now()), -3);
+            Date lastWeek = DateUtils.addDays(Date.from(Instant.now()), DAY_OFFSET);
             entries.values().stream()
                     .filter(x -> x.posted.after(lastWeek))
                     .collect(Collectors.toList())
@@ -75,7 +77,7 @@ public class NewsLoader {
     }
 
     public Stream<NewsEntry> getEntries() {
-        Date lastWeek = DateUtils.addDays(Date.from(Instant.now()), -3);
+        Date lastWeek = DateUtils.addDays(Date.from(Instant.now()), DAY_OFFSET);
         return entries.values()
                 .stream()
                 .filter(x -> x.posted.after(lastWeek))
@@ -123,7 +125,7 @@ public class NewsLoader {
     }
 
     private void processLatestEntries(Long[] ids) {
-        for (int i = ids.length / 2; i < ids.length; i++) {
+        for (int i = 0; i < ids.length; i++) {
             String id = ids[i].toString();
             if (entries.containsKey(id)) {
                 continue;

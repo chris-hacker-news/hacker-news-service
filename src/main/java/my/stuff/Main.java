@@ -8,7 +8,7 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            new NewsLoader(NewsLoader.SOURCES.News);
+            new NewsLoader(NewsLoader.SOURCES.Best);
 
             while (true) {
                 try {
