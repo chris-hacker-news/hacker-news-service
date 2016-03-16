@@ -115,7 +115,7 @@ public class NewsLoader {
                 } while (false);
 
                 try {
-                    Thread.sleep(60000);
+                    Thread.sleep(600000);
                 } catch (InterruptedException e1) {
                 }
             }
